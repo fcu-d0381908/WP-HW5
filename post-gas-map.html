@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>post-gas-map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script>
+
+
+    var map;
+	var infowindow;
+	var icons = {
+		post_office: {
+			icon: 'post_office.jpg'
+		},
+		gas_station: {
+			icon: 'gas_station.jpg'
+		},
+	};
+	
+      function initMap() {
+		infowindow  = new google.maps.InfoWindow();
+		
+        var fcu = {lat: 24.178826, lng: 120.646726};
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: fcu,
+          zoom: 13
+        });
+		var request_post_office = {
+			query: '台中西屯',
+			type: ['post_office']
+		};
+		var request_gas_station = {
+			query: '台中西屯',
+			type: ['gas_station']
+		};
+        infowindow = new google.maps.InfoWindow();
+        var service = new google.maps.places.PlacesService(map);
+		service.textSearch(request_post_office,post_office_callback);
+		service.textSearch(request_gas_station,gas_station_callback);
+      }
+	  
+      function post_office_callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+			setIcon('post_office',results[i]);
+          }
+        }
+      }
+	  
+	  function gas_station_callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+			setIcon('gas_station',results[i]);
+          }
+        }
+      }
+	  
+	function setIcon(type,place){
+		
+		var marker = new google.maps.Marker({
+			position: place.geometry.location,
+			icon: icons[type].icon,
+			map: map
+		});
+		setInfoWindow(marker,place);
+	}
+	
+	function setInfoWindow(marker,place){
+		google.maps.event.addListener(marker, 'mouseover', function() {
+          infowindow.setContent(place.name);
+          infowindow.open(map, this);
+        });
+	}
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVzeYipfPzJuiHOUEu1CNUy9cYuaLBHaY&libraries=places&callback=initMap" async defer></script>
+  </body>
+</html>
